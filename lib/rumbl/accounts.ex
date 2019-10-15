@@ -21,6 +21,10 @@ defmodule Rumbl.Accounts do
     Repo.all(User)
   end
 
+  def change_user(%User{} = user) do
+    User.changeset(user, %{})
+  end
+
   # def list_users() do
   #   [
   #     %User{id: "1", name: "José", username: "josevalim"},
