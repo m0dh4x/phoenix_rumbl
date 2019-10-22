@@ -9,8 +9,9 @@ defmodule RumblWeb.UserController do
     render(conn, "index.html", users: users)
   end
 
-  def show(conn, %{"id" => id}) do
-    user = Accounts.get_user(id)
+  def show(conn, %{"username" => username}) do
+    # IO.inspect(username, label: "test")
+    user = Accounts.get_user_by(username: username)
     render(conn, "show.html", user: user)
   end
 
@@ -20,10 +21,14 @@ defmodule RumblWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    {:ok, user} = Accounts.create_user(user_params)
+    case Accounts.create_user(user_params) do
+      {:ok, user} ->
+        conn
+        |> put_flash(:info, "#{user.name} created!")
+        |> redirect(to: Routes.user_path(conn, :index))
 
-    conn
-    |> put_flash(:info, "#{user.name} created!")
-    |> redirect(to: Routes.user_path(conn, :index))
+      {:error, %Ecto.Changeset{} = changeset} ->
+        render(conn, "new.html", changeset: changeset)
+    end
   end
 end
